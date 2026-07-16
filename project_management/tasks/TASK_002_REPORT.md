@@ -1,36 +1,25 @@
-# Reporte de Tarea: TASK-002 (Sprint 4)
+# Reporte de Tarea: Backend HTTP Architecture (TASK-002)
 
-**Sprint:** 4 – Application Layer & Use Cases  
-**Nombre de la Tarea:** DTO Design  
+**Sprint:** 5 – Infrastructure & Delivery Layer  
+**Nombre de la Tarea:** Backend HTTP Architecture (TASK-002)  
 **Estado:** Completada  
 
 ## 1. Objetivo
-Diseñar la arquitectura perimetral de entrada y salida de datos de la Application Layer mediante el patrón DTO (Data Transfer Object), asegurando un desacoplamiento absoluto entre lo que el exterior envía/recibe y cómo el modelo interno está construido.
+Diseñar la arquitectura HTTP (Delivery Layer) que servirá de frontera entre el mundo exterior y el Knowledge Engine (Application Layer), asegurando un blindaje absoluto contra la filtración de lógica de negocio o infraestructura en el núcleo.
 
-## 2. Directorios creados
-Ubicados en `backend/src/application/dto/`:
-- `capture/`
-- `classification/`
-- `evidence/`
-- `fingerprint/`
-- `protocol/`
-- `session/`
-- `shared/` (para constructos de paginación, metadatos, etc.)
+## 2. Entregables
+- Documento normativo oficial: `docs/20_BackendHttpArchitecture.md`.
+- Estructura de directorios base generada en `backend/src/` (`controllers`, `routes`, `middlewares`, `errors`, `responses`, `config`, `http`).
 
-## 3. Convención de nombres
-Aprobada formalmente:
-- Ingreso: `[Verbo/Acción][Entidad]RequestDTO` (ej. `CreateCaptureRequestDTO`).
-- Egreso: `[Entidad]ResponseDTO` (ej. `CaptureResponseDTO`).
-- La expresividad funcional precede al reduccionismo técnico.
+## 3. Decisiones Arquitectónicas (Registradas en el Casebook)
+- **DA-031 ("Las fronteras traducen, nunca deciden"):** Restringe la responsabilidad de los controladores a ser meros adaptadores entre peticiones HTTP y DTOs, prohibiéndoles tocar repositorios o tomar decisiones del dominio.
+- **DA-032 ("HTTP es reemplazable"):** La capa de Aplicación no debe saber jamás cómo fue invocada (REST, GraphQL, gRPC), asegurando la longevidad del código central.
 
-## 4. Reglas de diseño (DA-012)
-- Los DTO son contratos inmutables de casos de uso, no espejos de tablas.
-- Carecen de dependencias a Prisma o Express.
-- Carecen de lógica de negocio o métodos mutables.
-- Tipado TypeScript estricto, sin `any`.
+## 4. Restricciones Aplicadas y Verificadas
+Se garantizó que el diseño prohíbe explícitamente:
+- A un Controller conocer de SQL o Prisma.
+- A un Use Case conocer códigos HTTP (`400`, `200`) o los objetos de Express (`req`, `res`).
+- A un Route contener lógica procedimental.
 
-## 5. Diferencias con Entidades
-Mientras la Entidad `Capture` es la "Verdad del Negocio" y contiene reglas invariantes, el DTO es simplemente el "Mensajero". La Entidad cambia si el negocio cambia; el DTO solo cambia si la interfaz de usuario (o el consumidor de la API) requiere enviar o recibir datos de manera distinta para un caso de uso particular.
-
-## 6. Riesgos identificados
-- **Duplicidad Inicial Percibida:** Los desarrolladores menos familiarizados con Clean Architecture podrían considerar "redundante" tener un `CreateCaptureRequestDTO` y luego un `Capture` Entity que en los primeros Sprints lucirán muy parecidos. Sin embargo, este peaje temprano es lo que salva a la aplicación de fracturarse cuando la base de datos comience a diferir drásticamente de los payloads de la API en el futuro. Se requerirá rigor en las revisiones de código para evitar que los DTOs incorporen métodos lógicos o dependencias externas.
+## 5. Conclusión y Siguientes Pasos
+La arquitectura HTTP teórica está congelada. El documento normativo guiará a los desarrolladores durante el resto del Sprint. El siguiente paso lógico, conforme al roadmap del Sprint, es definir el **API Error Model (TASK-003)** y el **REST Response Standard (TASK-004)** antes de programar cualquier endpoint real.

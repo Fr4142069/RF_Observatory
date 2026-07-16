@@ -1,23 +1,24 @@
-# Reporte de Tarea: Cierre del Sprint 4 (TASK-010)
+# Reporte de Tarea: Knowledge Lifecycle (TASK-010)
 
-**Sprint:** 4 – Application Layer & Use Cases  
-**Nombre de la Tarea:** Cierre Formal del Sprint 4 (TASK-010)  
+**Sprint:** 5 – Infrastructure & Delivery Layer  
+**Nombre de la Tarea:** Knowledge Lifecycle (TASK-010)  
 **Estado:** Completada  
 
-## 1. Resumen
-Se ha redactado y emitido exitosamente el Documento Oficial de Cierre (`SPRINT_04_CLOSEOUT.md`). Esta acción obedece a la recién instaurada directriz **DA-028**, que prohíbe tácitamente dar por finalizado un ciclo de trabajo basándose únicamente en código funcional. 
+## 1. Objetivo
+Implementar la gobernanza de protocolos (Registrar y Publicar) de forma unificada para exponer el ciclo de vida del conocimiento mediante la API REST, respetando el patrón de Referencia y consolidando la visión del Observatorio como autoridad científica.
 
-## 2. Entregables Generados
-- `project_management/SPRINT_04_CLOSEOUT.md`
+## 2. Entregables
+- **Controller Unificado:** `ProtocolController.ts` que engloba tanto el UC-006 (Register) como el UC-007 (Publish).
+- **Rutas:** `protocol.routes.ts` con `POST /` y `POST /:protocolId/publish`.
+- **Bootstrap:** Factorías en `repositoryFactory.ts`, `applicationFactory.ts`, `controllerFactory.ts` y montaje en `serverBootstrap.ts`.
+- **Documentación:** `docs/29_KnowledgeLifecycle.md`.
+- **Decisiones Registradas (Casebook):** **DA-049** (El conocimiento es gobernado) y **DA-050** (Publicar no es registrar).
 
-## 3. Estado Final
-El documento engloba de manera definitiva la consolidación de:
-- Los 8 Casos de Uso principales.
-- Los 4 Documentos Normativos (La Teoría del Conocimiento).
-- Las 16 Decisiones Arquitectónicas emitidas en este Sprint (DA-013 a DA-028).
-- La Auditoría Integral Aprobada (TASK-009).
+## 3. Resumen de Implementación
+Siguiendo la inercia del Sprint 5, se aplicó la clonación arquitectónica del Endpoint de Referencia. 
+Al tratar UC-006 y UC-007 de forma conjunta, se agrupó su entrega HTTP en el mismo controlador `ProtocolController`. Esto mantiene la cohesión por recurso (`/protocols`), logrando que la acción de publicación se modele limpiamente bajo el sub-recurso de mutación de estado (`/:protocolId/publish`).
+La infraestructura transversal (Factories de JSON, validaciones implícitas en Comandos, y GlobalErrorHandler) operó a la perfección.
 
-## 4. Observaciones Estratégicas
-Al plasmar en papel todo lo logrado, se hizo evidente que el proyecto cruzó un rubicón arquitectónico. Empezamos el Sprint 4 con la misión de construir una "Application Layer", pero terminamos formalizando una metodología científica auditable mediante software. El RF_Observatory ya no depende del conocimiento tácito de quienes lo iniciaron; toda su inteligencia, restricciones y filosofía están codificadas y explicadas explícitamente en el repositorio.
-
-El Sprint 4 queda formalmente enterrado en el repositorio como un éxito rotundo. Se levantan las compuertas para el Sprint 5.
+## 4. Estado y Siguientes Pasos
+El sistema ahora ostenta un catálogo de conocimiento gobernable accesible desde el exterior. 
+Queda una última pieza fundamental para el Sprint 5: la **Fase 4 (Consulta)** a través de UC-008 (Search), que actuará como la ventana de interrogación contra todo el cúmulo de información generada por estas APIs.

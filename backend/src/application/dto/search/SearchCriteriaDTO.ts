@@ -1,5 +1,8 @@
 export interface SearchCriteriaDTO {
   readonly freeText?: string;
+  readonly keyword?: string;
+  readonly types?: string[];
+  readonly frequencyRange?: { min: number; max: number };
   readonly fingerprintId?: string;
   readonly protocolId?: string;
   readonly manufacturer?: string;

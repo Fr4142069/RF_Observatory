@@ -4,8 +4,19 @@ import { AttachEvidenceValidator } from '../../validators/evidence/AttachEvidenc
 import { CaptureRepository } from '../../../domain/repositories/CaptureRepository';
 import { ClassificationRepository } from '../../../domain/repositories/ClassificationRepository';
 import { FingerprintRepository } from '../../../domain/repositories/FingerprintRepository';
-// Simularemos un EvidenceRepository que será creado después
-import { Evidence } from '../../../../shared/src/domain/entities/Evidence';
+export interface Evidence {
+  id: string;
+  captureId: string;
+  evidenceType: { type: string };
+  title: string;
+  description?: string;
+  author: string;
+  origin: string;
+  status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  referenceUri?: string;
+  textContent?: string;
+  createdAt: { value: Date };
+}
 import { ApplicationError } from '../../errors/ApplicationError';
 import { randomUUID } from 'crypto';
 

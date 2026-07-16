@@ -180,6 +180,174 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 
 ---
 
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-030. "La API REST nunca contendrá lógica de negocio". Los Controllers únicamente actúan como fachada: reciben HTTP, convierten la petición en DTOs, invocan a los Casos de Uso (Application Layer) y envuelven la respuesta en un formato HTTP estandarizado. Toda decisión, mutación o regla de validación de negocio seguirá viviendo estrictamente en la Capa de Aplicación y en el Dominio.
+**Impacto:** Crítico. Preserva el aislamiento del Knowledge Engine conseguido en el Sprint 4. Permite que en el futuro se puedan crear interfaces GraphQL, CLI o gRPC compartiendo exactamente el mismo núcleo orquestal sin duplicar lógica.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-031. "Las fronteras traducen, nunca deciden". Los Controllers actúan exclusivamente como traductores bidireccionales entre el protocolo de transporte (HTTP) y el lenguaje del negocio (Application Layer). No toman decisiones, no conocen el Dominio (solo interactúan a través de DTOs) y no poseen lógica condicional de negocio. Su único flujo es: `HTTP -> DTO -> UseCase -> ResponseDTO -> HTTP`.
+**Impacto:** Crítico. Elimina el riesgo de "Fuga de Dominio", asegurando que conceptos como `Request`, `Response` o `next` de Express jamás penetren en los Casos de Uso.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-032. "HTTP es reemplazable". La Application Layer no debe tener forma de distinguir si fue invocada por una petición HTTP REST, una mutación GraphQL, una llamada gRPC, un job CRON, una cola RabbitMQ, un comando CLI o una prueba unitaria.
+**Impacto:** Estratégico. Garantiza la extrema longevidad del sistema. Si los protocolos de comunicación cambian en el futuro, solo será necesario programar nuevos "Adaptadores/Controladores" sin tocar ni una línea del Knowledge Engine.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-033. "Los errores son contratos, no textos". Toda respuesta de error de RF_Observatory deberá seguir un modelo único, estable y predecible. Los clientes consumirán códigos constantes y estructuras uniformes, erradicando los mensajes libres disonantes entre distintos endpoints.
+**Impacto:** Alto. Simplifica el consumo de la API, previene que los clientes se rompan ante redacciones de texto diferentes y estandariza la comunicación.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-034. "El código identifica; el mensaje explica". Las aplicaciones cliente deben tomar decisiones lógicas (if/else/switch) basándose exclusivamente en el campo `code` de la respuesta de error (ej: `KNOWN_PROTOCOL_NOT_FOUND`). Nunca se deberá interpretar el texto de los campos `title` o `detail`.
+**Impacto:** Alto. Permite la futura internacionalización (i18n) de los mensajes de error sin romper las integraciones de los clientes.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-035. "Toda respuesta exitosa tiene la misma forma". Toda operación exitosa de RF_Observatory deberá responder utilizando un único contrato REST oficial. Queda prohibido devolver arrays u objetos desnudos en la raíz de la respuesta HTTP. El formato universal requiere un envoltorio con `timestamp`, `requestId`, `success`, `data` y `meta`.
+**Impacto:** Alto. Estandariza el consumo de la API. Cualquier cliente o parser construido para la API podrá ingerir la respuesta sin importar el endpoint consultado.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-036. "El contrato HTTP es estable". Una vez publicado el contrato oficial de respuestas REST, cualquier cambio incompatible (eliminar o renombrar campos base) requerirá obligatoriamente un cambio mayor de versión de la API (ej: de v1 a v2). Solo se permite añadir campos opcionales sin incrementar la versión mayor.
+**Impacto:** Estratégico. Genera una garantía de compatibilidad hacia atrás y protege las integraciones B2B o el desarrollo de aplicaciones cliente descentralizadas.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-037. "Existe un único Composition Root". Toda la composición de objetos del sistema deberá realizarse en un único lugar lógico (Composition Root). Ningún Controller instanciará un Use Case, y ninguna Ruta instanciará un Controller. La inyección se hace manualmente de arriba hacia abajo para evitar acoplamiento oculto.
+**Impacto:** Crítico. Mantiene la pureza de la inversión de dependencias y facilita la migración a un contenedor IoC automático si el proyecto crece a gran escala.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-038. "La composición ocurre una sola vez". El sistema ensamblará su grafo de objetos (Repositorios -> Use Cases -> Controllers -> Routes) exactamente una vez durante el arranque de la aplicación (Bootstrap). A partir de ese momento, el grafo es inmutable y ninguna capa puede crear nuevas dependencias estructurales en tiempo de ejecución.
+**Impacto:** Alto. Garantiza que la arquitectura se comporte de manera determinista y facilita enormemente el testing unitario y de integración.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-039. "Los Controllers no formatean respuestas". Un Controller nunca construirá manualmente un JSON de respuesta ni un JSON de error. Todo Controller deberá utilizar un `ResponseFactory` y un `ErrorFactory` para estructurar la salida HTTP, garantizando la uniformidad absoluta definida en los contratos REST.
+**Impacto:** Alto. Evita que la construcción del payload de respuesta mute a lo largo de los endpoints. Reduce la duplicación de código en los controladores.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-040. "La infraestructura es reutilizable". Toda la infraestructura HTTP deberá ser completamente reutilizable entre controladores. Ningún Controller podrá implementar por sí mismo mecanismos de respuesta, manejo de errores, generación de RequestId o comportamiento transversal (cross-cutting concerns).
+**Impacto:** Estratégico. Habilita que futuros endpoints se implementen rápidamente sin repetir lógicas estructurales (DRY).
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-041. "El primer endpoint define el estándar". El primer endpoint implementado (POST /captures) servirá como referencia oficial de calidad, estructura y organización (Controller, DTO, Validator, Route, Bootstrap, Factories) para todos los endpoints futuros. No es un ejemplo, es el estándar.
+**Impacto:** Alto. Garantiza que todos los desarrollos subsecuentes hereden un patrón idéntico y probado.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Metodología DA-042. "No se replica un patrón sin auditarlo". Todo patrón arquitectónico nuevo deberá implementarse una única vez y ser auditado rigurosamente antes de replicarse en el resto del sistema.
+**Impacto:** Crítico. Reduce drásticamente la deuda técnica al impedir que un error estructural o un anti-patrón se multiplique a través de múltiples controladores o módulos.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Metodología DA-043. "Un endpoint se certifica ejecutándolo". Ningún endpoint podrá convertirse en patrón oficial únicamente por revisión estática de código. Deberá superar pruebas funcionales ejecutándose sobre un servidor real (verificando códigos HTTP, envoltorios de error, etc.). La arquitectura se inspecciona; el comportamiento se demuestra.
+**Impacto:** Crítico. Evita aprobar "teorías arquitectónicas" que en la práctica explotan o no respetan el estándar JSON acordado.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Metodología DA-044. "La primera implementación certificada se convierte en referencia". Una vez que el primer endpoint supere satisfactoriamente la auditoría estática y funcional, quedará declarado como "Endpoint de Referencia". Todo nuevo endpoint deberá clonar exactamente el mismo patrón estructural, erradicando los "estilos personales".
+**Impacto:** Alto. Garantiza que, a lo largo de los años, toda la API mantenga un único lenguaje coherente.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-045. "Las búsquedas complejas son comandos de consulta". Toda búsqueda que admita múltiples filtros, estructuras complejas o criterios combinados (como Search) deberá implementarse mediante POST con un objeto de criterios en el body, y no mediante GET con query params. RF_Observatory es un motor de investigación, no un CRUD simple.
+**Impacto:** Alto. Permite estructurar consultas complejas JSON (ej. `confidence: { min: 0.85 }`) sin ensuciar la URL, promoviendo claridad en las peticiones.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-046. "Los algoritmos de comparación son reemplazables". El endpoint nunca debe conocer el algoritmo de comparación, delegando toda esa inferencia al Use Case correspondiente. 
+**Impacto:** Alto. Garantiza que la evolución a futuros motores de inferencia (IA, ML) no exija reescritura de APIs ni controladores.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-047. "La similitud es una evidencia, no una verdad". El observatorio es un laboratorio; nunca dictará "X es Y". En su lugar, emitirá evidencia cuantificada (Similarity, Confidence, Tier, Matched Features). 
+**Impacto:** Crítico. Preserva el rigor científico y delega la decisión final al investigador/usuario.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-048. "Los resultados científicos son reproducibles". Todo resultado emitido por el endpoint de comparación deberá poder reproducirse de manera determinista utilizando exactamente las mismas entradas (algoritmo, configuración, capturas).
+**Impacto:** Estratégico. Eleva el sistema al nivel de un verdadero instrumento de investigación científica, permitiendo auditorías y trazabilidad de inferencias.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-049. "El conocimiento es gobernado". Ningún protocolo conocido podrá incorporarse a la Base de Conocimiento oficial sin pasar por un proceso explícito de gobernanza y revisión. No todo lo observado es automáticamente un protocolo; existe un embudo estricto: Observación -> Hipótesis -> Protocolo Conocido -> Protocolo Publicado.
+**Impacto:** Crítico. Establece que RF_Observatory no es un mero log de señales, sino un ente que certifica descubrimientos científicos.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-050. "Publicar no es registrar". Son etapas distintas del ciclo de vida. Registrar (UC-006) significa proponer un protocolo (editable, mudable). Publicar (UC-007) significa certificarlo y congelarlo como conocimiento institucional (citable, inmutable, exportable).
+**Impacto:** Alto. Impone el control de estados y abre la puerta a futuras capacidades de versionado, revisión por pares y trazabilidad.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-051. "La API expresa acciones de negocio". Los endpoints de RF_Observatory deberán representar acciones del dominio (RPC style / verbos de negocio como `POST /compare` o `POST /publish`) y no operaciones CRUD genéricas (PUT/PATCH/DELETE) que no explican qué está ocurriendo semánticamente.
+**Impacto:** Crítico. Evita la mentalidad de "gestor de base de datos" en favor de una API de investigación.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Arquitectura DA-052. "Search nunca consulta tablas". Toda búsqueda (UC-008) consulta el modelo de conocimiento del Observatorio, no filas de una base de datos.
+**Impacto:** Alto. Abstrae la persistencia por completo. Si en el futuro RF_Observatory usa Elasticsearch o Vector DBs, el endpoint de Search permanece inmutable.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 5
+**Descripción:** Decisión de Metodología DA-053. "La integración completa se certifica antes del cierre". Antes de declarar finalizado un Sprint que introduzca capacidades accesibles mediante API, deberá ejecutarse al menos un flujo funcional completo de extremo a extremo (E2E) utilizando únicamente interfaces públicas (Endpoints).
+**Impacto:** Estratégico. Garantiza que no existan eslabones rotos en la cadena operativa del Observatorio.
+**Estado:** Resuelto y Aprobado.
+
+---
+
 ### [2026-07-15] - Sprint 13
 **Descripción:** Decisión de Ingeniería DI-001. "Todas las migraciones de RF_Observatory serán reproducibles desde cero". Cualquier desarrollador o entorno deberá poder levantar la base de datos de cero ejecutando únicamente las migraciones versionadas de Prisma. Quedan terminantemente prohibidos los cambios manuales en la base de datos que no estén reflejados en una migración oficial.
 **Impacto:** Crítico. Asegura la portabilidad inter-entornos (Desarrollo, Pruebas, Producción) y erradica el "drift" (desvío) del esquema a lo largo de los años de vida del proyecto.

@@ -1,50 +1,26 @@
-# Reporte de Tarea: TASK-005 (Sprint 3)
+# Reporte de Tarea: Dependency Injection Bootstrap (TASK-005)
 
-**Sprint:** 3 – Persistencia  
-**Nombre de la Tarea:** Primera Migración Oficial  
-**Estado:** Documentada y Preparada (Pendiente de Ejecución Host)
+**Sprint:** 5 – Infrastructure & Delivery Layer  
+**Nombre de la Tarea:** Dependency Injection Bootstrap (TASK-005)  
+**Estado:** Completada  
 
 ## 1. Objetivo
-Generar la primera migración oficial de RF_Observatory utilizando Prisma Migrate para materializar el esquema de base de datos en PostgreSQL, sentando el precedente inmutable de que toda evolución futura deberá versionarse de forma controlada.
+Diseñar el esquema inmutable de ensamblaje (Dependency Graph) para que todas las dependencias estructurales del sistema (Repositorios, Casos de Uso, Controladores) se inyecten de manera manual y tipada en un único punto lógico (el Composition Root), evadiendo la necesidad de ensuciar el código del dominio con decoradores de librerías de terceros (IoC).
 
-## 2. Nombre de la migración
-- `init_schema` (Versión inicial).
+## 2. Entregables
+- Directorio de infraestructura creado: `backend/src/bootstrap/`.
+- Documento oficial de arquitectura generado: `docs/23_DependencyInjectionArchitecture.md`.
+- Decisiones arquitectónicas registradas en el Casebook: **DA-037** (Único Composition Root) y **DA-038** (Ensamblaje ejecutado solo una vez).
 
-## 3. Archivos a generar por Prisma
-Al ejecutarse el comando en el entorno que cuente con el daemon de Docker, Prisma producirá:
-- `backend/prisma/migrations/<timestamp>_init_schema/migration.sql`: El script DDL puro con los comandos `CREATE TABLE`.
-- `backend/prisma/migrations/migration_lock.toml`: Archivo de estado para proteger el historial de migraciones.
+## 3. Resumen del Diseño Estructural
+Se estableció el *Composition Root* como la única zona autorizada para "ensuciarse" importando todas las capas. Se diseñó su división en fábricas específicas:
+- `repositoryFactory`: Inicializa las implementaciones de base de datos.
+- `applicationFactory`: Construye Casos de Uso recibiendo los repositorios previamente construidos.
+- `controllerFactory`: Construye los controladores HTTP inyectando los Casos de Uso.
+- `serverBootstrap`: Conecta las salidas de los controladores con las rutas de Express.
 
-## 4. Tablas preparadas para su creación
-De acuerdo al `schema.prisma` validado, se instanciarán:
-- `Session`
-- `Capture`
-- `Fingerprint`
-- `KnownProtocol`
-- `UnknownProtocol`
-- `Classification`
-- `Evidence`
-- `DecoderResult`
-- `QualityReport`
-- *(Incluyendo los tipos Enum nativos: `CaptureStatus`, `QualityLevel`, `EvaluationStatus`)*.
+Esta inversión de control manual garantiza que el núcleo de la aplicación permanezca puro e inmutable, y que cualquier framework IoC futuro solo reemplace a estos *factories* sin afectar ninguna otra capa.
 
-## 5. Relaciones verificadas
-- Relaciones jerárquicas 1:N (Ej. Session -> Capture) provistas del mandato `ON DELETE CASCADE` a nivel físico.
-- Claves primarias mapeadas exitosamente como `UUID`.
-- Claves foráneas (Foreign Keys) debidamente indexadas.
-
-## 6. Resultado esperado de prisma generate
-La regeneración del cliente (`npx prisma generate`) inyectará dentro de `node_modules/@prisma/client` todos los tipos estrictos de TypeScript derivados de nuestra base de datos, garantizando type-safety absoluto en la futura lógica de los repositorios.
-
-## 7. Resultado esperado de prisma migrate
-Prisma aplicará el esquema a la base shadow, detectará los cambios contra la base vacía y aplicará la migración, insertando un registro en la tabla `_prisma_migrations` para asentar que `init_schema` fue desplegada.
-
-## 8. Riesgos encontrados y Notas de Entorno
-- **Nota de Entorno:** El entorno aislado (sandbox) en el que opero como agente carece actualmente de los binarios del motor de Docker. En consecuencia, es físicamente imposible levantar PostgreSQL de forma autónoma en mi sesión. 
-- **Solución:** La tarea ha sido orquestada a la perfección en el plano documental e infraestructural. El **USER** deberá ejecutar manualmente la ignición desde su terminal anfitriona (host).
-
-## 9. Confirmación de Restricciones
-- **NO** se modificó el `schema.prisma`.
-- **NO** se modificó el Dominio conceptual.
-- **NO** se editó manualmente ningún archivo SQL ni se alteraron tablas por fuera de la orquestación.
-- Se reafirma el apego absoluto a la regla **DI-003**: La base de datos es un artefacto secundario; la fuente de verdad siempre será el Dominio.
+## 4. Estado y Siguientes Pasos
+Se ha cumplido íntegramente la restricción de no escribir endpoints, no codificar el contenedor ni modificar los casos de uso.
+Con este mapa logístico cerrado, el proyecto se declara listo para la **TASK-006 (REST API)**, que será la implementación física final donde Express, Controladores, Middlewares de Error y el Bootstrap cobrarán vida para habilitar los Casos de Uso de Observación y Consultas.

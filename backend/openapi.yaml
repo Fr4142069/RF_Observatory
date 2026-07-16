@@ -1,0 +1,346 @@
+openapi: 3.0.3
+info:
+  title: RF_Observatory API
+  description: API Científica para la gestión y análisis de capturas de radiofrecuencia, inferencia de fingerprints y publicación de protocolos.
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+    description: RF_Observatory Local Development Server
+
+tags:
+  - name: Captures
+    description: Ingesta de señales y metadatos base
+  - name: Evidence
+    description: Adjunción de pruebas y fotografías
+  - name: Fingerprints
+    description: Inferencia y comparación empírica de señales
+  - name: Protocols
+    description: Gobernanza y publicación de conocimiento
+  - name: Search
+    description: Motor de consulta científica
+
+paths:
+  /captures:
+    post:
+      summary: Register Capture
+      description: Ingesta una nueva captura de señal de RF.
+      tags:
+        - Captures
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterCaptureRequest'
+      responses:
+        '201':
+          description: Captura registrada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /evidence:
+    post:
+      summary: Register / Attach Evidence
+      description: Adjunta evidencia (foto, documento, referencia) a un Capture, Fingerprint o Protocolo.
+      tags:
+        - Evidence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterEvidenceRequest'
+      responses:
+        '201':
+          description: Evidencia adjuntada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /fingerprints/compare:
+    post:
+      summary: Compare Fingerprints
+      description: Compara una firma base contra otras u otra específica utilizando el motor de inferencia.
+      tags:
+        - Fingerprints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompareFingerprintsRequest'
+      responses:
+        '200':
+          description: Comparación completada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /protocols:
+    post:
+      summary: Register Known Protocol
+      description: Registra una nueva hipótesis de protocolo en estado DRAFT.
+      tags:
+        - Protocols
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterProtocolRequest'
+      responses:
+        '201':
+          description: Hipótesis de protocolo registrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /protocols/{protocolId}/publish:
+    post:
+      summary: Publish Known Protocol
+      description: Transiciona oficialmente un protocolo de DRAFT/REVIEW a PUBLISHED.
+      tags:
+        - Protocols
+      parameters:
+        - name: protocolId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approvedBy:
+                  type: string
+                  description: Identificador del experto que aprueba
+      responses:
+        '200':
+          description: Protocolo publicado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /search:
+    post:
+      summary: Search Observatory
+      description: Consulta el modelo de conocimiento del observatorio.
+      tags:
+        - Search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchCriteriaRequest'
+      responses:
+        '200':
+          description: Resultados de la búsqueda científica.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        requestId:
+          type: string
+        success:
+          type: boolean
+          default: true
+        data:
+          type: object
+          description: Estructura del resultado según el endpoint.
+        meta:
+          type: object
+          properties:
+            executionTime:
+              type: integer
+    
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        requestId:
+          type: string
+        success:
+          type: boolean
+          default: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+    RegisterCaptureRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        frequency:
+          type: number
+        sampleRate:
+          type: number
+        hardwareId:
+          type: string
+        antennaId:
+          type: string
+        gain:
+          type: number
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+            altitude:
+              type: number
+
+    RegisterEvidenceRequest:
+      type: object
+      properties:
+        targetId:
+          type: string
+        targetType:
+          type: string
+          enum: [CAPTURE, CLASSIFICATION, FINGERPRINT]
+        evidenceType:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        author:
+          type: string
+        referenceUri:
+          type: string
+
+    CompareFingerprintsRequest:
+      type: object
+      properties:
+        sourceFingerprintId:
+          type: string
+        targetFingerprintId:
+          type: string
+
+    RegisterProtocolRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        alias:
+          type: string
+        status:
+          type: string
+        version:
+          type: string
+        frequencyHertz:
+          type: number
+
+    SearchCriteriaRequest:
+      type: object
+      properties:
+        keyword:
+          type: string
+        types:
+          type: array
+          items:
+            type: string
+        frequencyRange:
+          type: object
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+  responses:
+    BadRequestError:
+      description: Parámetros inválidos o error semántico
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Entidad no procesable (Payload incorrecto)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFoundError:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

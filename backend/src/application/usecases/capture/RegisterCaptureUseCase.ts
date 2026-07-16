@@ -2,7 +2,7 @@ import { RegisterCaptureCommand } from '../../commands/capture/RegisterCaptureCo
 import { RegisterCaptureResponseDTO } from '../../dto/capture/RegisterCaptureResponseDTO';
 import { RegisterCaptureValidator } from '../../validators/capture/RegisterCaptureValidator';
 import { CaptureRepository } from '../../../domain/repositories/CaptureRepository';
-import { Capture } from '../../../../shared/src/domain/entities/Capture';
+import { Capture } from '../../../domain/entities/Capture';
 import { randomUUID } from 'crypto';
 import { ApplicationError } from '../../errors/ApplicationError';
 
@@ -14,13 +14,11 @@ export class RegisterCaptureUseCase {
     RegisterCaptureValidator.validate(command);
 
     try {
-      // 2. Construir la entidad (En un sistema real más avanzado, la Entidad validaría sus propias reglas de negocio)
-      // Usaremos los value objects simplificados definidos en shared/
+      // 2. Construir la entidad
       const newCapture: Capture = {
         id: randomUUID(),
         sessionId: command.sessionId,
-        receivedAt: { value: new Date() },
-        evidences: [], // Evidencias vacías por ahora, o podríamos agregar el rawSignalData aquí
+        createdAt: new Date(),
       };
 
       // 3. Persistir usando el repositorio inyectado
@@ -32,7 +30,7 @@ export class RegisterCaptureUseCase {
         frequency: command.frequency,
         modulation: command.modulation,
         status: 'REGISTERED',
-        registeredAt: newCapture.receivedAt.value,
+        registeredAt: newCapture.createdAt,
       };
     } catch (error: any) {
       // Evitamos propagar errores técnicos de Prisma al exterior

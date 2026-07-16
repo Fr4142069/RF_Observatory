@@ -1,46 +1,21 @@
-# Reporte de Tarea: TASK-004 (Sprint 3)
+# Reporte de Tarea: REST Response Standard (TASK-004)
 
-**Sprint:** 3 – Persistencia  
-**Nombre de la Tarea:** Infraestructura Docker para Persistencia  
+**Sprint:** 5 – Infrastructure & Delivery Layer  
+**Nombre de la Tarea:** REST Response Standard (TASK-004)  
 **Estado:** Completada  
 
 ## 1. Objetivo
-Preparar la infraestructura Docker oficial y exclusiva de RF_Observatory, garantizando que el entorno donde se ejecutará la primera migración de base de datos sea un reflejo idéntico del ecosistema que operará en producción, abstrayendo a los servicios de las particularidades del sistema operativo local.
+Diseñar un contrato único, uniforme y extensible para envolver todas las respuestas exitosas de la API REST. Este contrato busca erradicar la fragmentación en la que cada endpoint responde con un formato propio, facilitando así la construcción de clientes robustos.
 
-## 2. Archivos creados / modificados
-- `docker/docker-compose.yml`: Archivo de orquestación maestro.
-- `docker/.env.example`: Definición estandarizada de variables de entorno.
-- `docker/README.md`: Documentación operacional reescrita acorde a los límites del Sprint 3.
-- `project_management/tasks/TASK_004_REPORT.md`: Este documento de trazabilidad.
+## 2. Entregables
+- Se ha generado el documento oficial `docs/22_RestResponseStandard.md`.
+- Se han registrado las decisiones **DA-035** y **DA-036** en el `PROJECT_CASEBOOK.md`.
 
-## 3. Servicios definidos
-Se orquestaron estricta y únicamente dos servicios:
-1. **postgres**: Instancia `postgres:15-alpine`. Se configuró con un Healthcheck interno (`pg_isready`).
-2. **backend**: Instancia `node:20-alpine`. Se forzó una ejecución inerte mediante `tail -f /dev/null` y se condicionó su arranque (`depends_on: service_healthy`) para impedir colapsos por falta de base de datos en fases futuras de desarrollo.
+## 3. Resumen de Decisiones
+Se diseñó un *"Envelope"* universal que incluye los campos base: `timestamp`, `requestId`, `success`, `data`, y `meta`. 
+Dentro de `meta` se estructuró un bloque oficial para `pagination`, preparando la API para manejar catálogos extensos sin tener que inventar el formato sobre la marcha. 
 
-*(Por mandato, no se inyectaron contenedores de Frontend, Nginx ni Grafana).*
+Se estableció la severa regla (**DA-036**) de que este contrato es un pacto inquebrantable; se prohíbe eliminar o renombrar campos sin crear una API "V2", protegiendo a todos los futuros consumidores de roturas sorpresivas. 
 
-## 4. Volúmenes
-- `rf_observatory_pgdata`: Volumen persistente (`/var/lib/postgresql/data`). 
-**Propósito:** Proteger la persistencia física del catálogo para que los datos no se destruyan o purguen al apagar o reiniciar los contenedores.
-
-## 5. Redes
-- `rf_observatory_network`: Red interna (bridge) dedicada en exclusividad al proyecto. Responde directamente al mandato **DI-002**, permitiendo que el proyecto flote en su propia burbuja sin contaminar ni mezclarse con redes de SmartAccess u otros proyectos.
-
-## 6. Variables utilizadas
-Se documentó la parametrización de:
-- `POSTGRES_USER`
-- `POSTGRES_PASSWORD`
-- `POSTGRES_DB`
-- `POSTGRES_PORT`
-- `DATABASE_URL` (El servicio backend construye dinámicamente esta cadena de conexión interpolando las variables del entorno).
-
-## 7. Validaciones ejecutadas
-- Revisión de sintaxis YAML (versión 3.8). *(Nota operativa: Aunque el motor local actual del agente en Windows carece del binario de Docker para resolver localmente el `config`, la estructura ha sido auditada estáticamente y es 100% compliant con las especificaciones estándar de Compose).*
-
-## 8. Confirmación de Restricciones
-- **NO** se ejecutó `docker compose up`.
-- **NO** se instanció PostgreSQL de forma real.
-- **NO** se crearon ni ejecutaron migraciones de Prisma.
-- **NO** se modificó bajo ningún concepto el Dominio ni el Modelo Relacional.
-- La infraestructura queda en estado durmiente, perfectamente formateada y esperando la ignición para la TASK-005.
+## 4. Estado y Siguientes Pasos
+La tarea no incluyó escritura de código fuente ni *middlewares*, cumpliendo a cabalidad con la restricción solicitada. Al tener ahora tanto el Modelo de Errores (TASK-003) como el Estándar de Éxito (TASK-004) perfectamente tipificados, el proyecto se encuentra en condiciones inmejorables para la **TASK-005 (Dependency Injection Bootstrap)**. En la TASK-005, el flujo entre `Router -> Controller -> Application` podrá armarse sabiendo exactamente con qué moldes debe envolverse la salida.

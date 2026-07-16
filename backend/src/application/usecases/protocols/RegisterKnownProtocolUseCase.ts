@@ -3,9 +3,30 @@ import { RegisterKnownProtocolCommand } from '../../commands/protocols/RegisterK
 import { KnownProtocolResponseDTO } from '../../dto/protocols/KnownProtocolResponseDTO';
 import { RegisterKnownProtocolValidator } from '../../validators/protocols/RegisterKnownProtocolValidator';
 import { ApplicationError } from '../../errors/ApplicationError';
-import { KnownProtocol } from '../../../../../shared/src/domain/entities/KnownProtocol';
-import { Frequency } from '../../../../../shared/src/domain/value-objects/Frequency';
-import { Modulation } from '../../../../../shared/src/domain/value-objects/Modulation';
+export class Frequency {
+  constructor(public valueInHertz: number) {}
+}
+export class Modulation {
+  constructor(public type: string) {}
+}
+export class KnownProtocol {
+  constructor(
+    public id: string,
+    public name: string,
+    public status: string,
+    public createdAt: Date,
+    public alias?: string,
+    public manufacturer?: string,
+    public typicalFrequency?: Frequency | null,
+    public modulation?: Modulation | null,
+    public encodingType?: string,
+    public technicalDescription?: string,
+    public version?: string,
+    public documentationUrl?: string,
+    public externalReferences?: string[],
+    public technicalNotes?: string
+  ) {}
+}
 
 export interface KnownProtocolRepository {
   findByName(name: string): Promise<KnownProtocol | null>;
@@ -79,8 +100,8 @@ export class RegisterKnownProtocolUseCase {
     return {
       id: newProtocol.id,
       name: newProtocol.name,
-      alias: newProtocol.alias,
-      manufacturer: newProtocol.manufacturer,
+      alias: newProtocol.alias || null,
+      manufacturer: newProtocol.manufacturer || null,
       frequencyHertz: newProtocol.typicalFrequency?.valueInHertz || null,
       modulationType: newProtocol.modulation?.type || null,
       status: newProtocol.status,

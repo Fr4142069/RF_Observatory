@@ -1,27 +1,24 @@
-# Reporte de Tarea: Auditoría Integral del Sprint 4 (TASK-009)
+# Reporte de Tarea: Tercer Vertical REST (TASK-009)
 
-**Sprint:** 4 – Application Layer & Use Cases  
-**Nombre de la Tarea:** Auditoría Integral del Sprint 4 (TASK-009)  
-**Estado:** Completada (APROBADO)
+**Sprint:** 5 – Infrastructure & Delivery Layer  
+**Nombre de la Tarea:** Third REST Vertical (TASK-009)  
+**Estado:** Completada  
 
 ## 1. Objetivo
-Asegurar que la implementación de los ocho Casos de Uso centrales y sus componentes satélite (DTOs, Commands, Validators) no haya transgredido los principios de Clean Architecture y las Decisiones de Arquitectura (DA) consolidadas en el Casebook. 
+Implementar la exposición del motor de inferencia del Observatorio (Compare Fingerprints, UC-005) replicando el Patrón de Referencia, demostrando que la API sirve de puente ciego entre el mundo HTTP y el mundo científico de la Application Layer.
 
-## 2. Metodología Ejecutada
-Se obedeció la **DA-027 (Auditar antes de corregir)**. Se utilizaron herramientas de inspección global (`grep`, lectura de directorios) para barrer las siguientes infracciones:
-- SQL directo en Aplicación.
-- Lógica dentro de DTOs.
-- Validators acoplados a Repositorios.
-- Dominio contaminado con Infraestructura (Express, Prisma).
+## 2. Entregables
+- **Controller:** `CompareFingerprintsController.ts` creado.
+- **Rutas:** `fingerprint.routes.ts` que monta `POST /compare`.
+- **Inyección Centralizada:** Añadidos mocks en `repositoryFactory.ts` (FingerprintRepository, ComparisonResultRepository, y FingerprintComparisonDomainService) y se ensambló el árbol en `applicationFactory.ts`, `controllerFactory.ts` y `serverBootstrap.ts`.
+- **Documentación:** Creado `docs/28_FingerprintComparisonEndpoint.md`.
+- **Decisiones Registradas (Casebook):** **DA-046**, **DA-047**, y **DA-048** (relacionadas al rigor algorítmico, evidencia empírica y reproducibilidad).
 
-## 3. Hallazgos
-- **Pureza Confirmada:** La carpeta `shared/src/domain/` se mantuvo 100% aislada.
-- **Abstracción Confirmada:** Toda la persistencia en `src/application/usecases` fluye mediante Interfaces (Puertos). El archivo `backend/src/domain/repositories/` consta únicamente de firmas de métodos. Ningún *ORM* está acoplado al negocio.
-- **Fidelidad Teórica:** El Modelo de Conocimiento Normativo (D01-D04) está rigurosamente mapeado. En lugar de ser letra muerta en archivos Markdown, el código de `UC-005`, `UC-007` y `UC-008` contiene las barreras descritas en la teoría (por ejemplo, impidiendo la publicación de protocolos vacíos).
+## 3. Resumen de Implementación
+El controlador extrae los UUID de comparación y lanza el Command hacia la Application Layer.
+La gran proeza arquitectónica de esta tarea es que `CompareFingerprintsController` ignora por completo cómo se procesan las señales. Únicamente mapea un DTO de salida hacia un JSON y lo empaca dentro del `ResponseFactory`. 
+Con esto, el equipo científico del proyecto puede evolucionar libremente el `FingerprintComparisonDomainService` (el algoritmo real) durante años sin que el consumidor de la API REST cambie una sola línea de código, garantizando un acoplamiento nulo.
 
-## 4. Riesgos y Observaciones
-- **Buena Práctica Detectada:** El diseño de `SearchPorts` concurrentes en `UC-008` es una decisión brillante que permitirá incorporar Microservicios de IA o Elasticsearch en el futuro con CERO refactorización del código de negocio.
-- **Riesgo Mitigado:** Se detuvo la creación prematura de la entidad `ProtocolFamily/Variant` para evitar sobre-ingeniería en `UC-006`. Se abordará orgánicamente si los Sprints futuros demuestran su necesidad.
-
-## 5. Dictamen Final
-**APROBADO**. El proyecto puede proceder al TASK-010 (Cierre del Sprint) y posteriormente iniciar la fase de Interfaces Externas (Sprint 5) sobre cimientos garantizados.
+## 4. Estado y Siguientes Pasos
+Este tercer vertical confirma que el Patrón de Referencia de la API es lo suficientemente flexible para endpoints transaccionales (guardar capturas) y para endpoints computacionales (inferir similitud). 
+El proyecto está expedito para proceder con la **Fase 3: Conocimiento** (Registrar y Publicar Protocolos).

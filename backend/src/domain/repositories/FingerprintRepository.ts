@@ -17,6 +17,12 @@ export interface FingerprintRepository {
   save(fingerprint: Fingerprint): Promise<void>;
 
   /**
+   * Recupera un fingerprint por su ID único.
+   * @param id El UUID del fingerprint.
+   */
+  findById(id: string): Promise<Fingerprint | null>;
+
+  /**
    * Recupera la huella asociada a una captura específica.
    * @param captureId El UUID de la captura.
    */

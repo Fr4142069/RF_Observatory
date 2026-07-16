@@ -12,6 +12,12 @@ import { Classification } from '../entities/Classification';
  */
 export interface ClassificationRepository {
   /**
+   * Recupera la clasificación por su ID único.
+   * @param id UUID de la clasificación.
+   */
+  findById(id: string): Promise<Classification | null>;
+
+  /**
    * Recupera la clasificación asignada a una captura.
    * @param captureId UUID de la captura origen.
    */

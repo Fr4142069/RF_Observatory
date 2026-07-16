@@ -1,38 +1,20 @@
-# Reporte de Tarea: TASK-003 (Sprint 3)
+# Reporte de Tarea: API Error Model (TASK-003)
 
-**Sprint:** 3 – Persistencia  
-**Nombre de la Tarea:** Preparación del Entorno de Persistencia  
+**Sprint:** 5 – Infrastructure & Delivery Layer  
+**Nombre de la Tarea:** API Error Model (TASK-003)  
 **Estado:** Completada  
 
 ## 1. Objetivo
-Preparar y documentar la infraestructura técnica y las dependencias indispensables para que el motor de Prisma pueda ejecutar las futuras migraciones hacia PostgreSQL, absteniéndose tajantemente de ejecutar dichas migraciones o alterar bases de datos en esta fase.
+Asegurar que la capa HTTP del RF_Observatory exponga un contrato de errores predecible, estandarizado y seguro frente a los clientes externos, evitando la fragmentación y la filtración de detalles internos de la base de datos.
 
-## 2. Archivos modificados
-- `backend/package.json`: Se instalaron y anclaron `prisma` y `@prisma/client` (v5.x) como dependencias.
-- `backend/.env.example`: Creado como plantilla inmutable que define y documenta la cadena de conexión esperada (`DATABASE_URL`).
-- `backend/README.md`: Expandido para documentar operativamente la persistencia, incluyendo configuración, validaciones y la estricta **Decisión de Ingeniería DI-001** sobre migraciones reproducibles.
-- `project_management/sprints/SPRINT_03_KICKOFF.md`: Actualizado para reflejar la nueva separación lógica y granularidad de las TASKs 003, 004 y 005.
-- `project_management/PROJECT_CASEBOOK.md`: Registrada la norma DI-001.
+## 2. Entregables
+- Se ha generado el documento oficial `docs/21_ApiErrorModel.md`.
+- Se han registrado las decisiones **DA-033** y **DA-034** en el `PROJECT_CASEBOOK.md`.
 
-## 3. Dependencias verificadas
-Se validó la presencia de:
-- `Prisma CLI` (Herramienta de desarrollo y orquestación de DB).
-- `Prisma Client` (Cliente generador).
+## 3. Resumen de Decisiones
+Se ha congelado un formato JSON obligatorio para todos los errores de la API. Este formato incluye identificadores críticos como `requestId` (esencial para trazabilidad de logs), un código semántico constante (`code`, ej. `PROTOCOL_ALREADY_EXISTS`) que será utilizado para decisiones lógicas en los clientes, y descripciones humanas (`title`, `detail`) diseñadas para ser amigables o traducibles. 
 
-## 4. Variables de entorno documentadas
-Se documentó explícitamente en el README y `.env.example`:
-- `DATABASE_URL`: Cadena de conexión obligatoria que enlazará a la futura instancia de Docker. Se dejó estipulada la advertencia de seguridad para no exponer secretos reales en el repositorio.
+Se estableció una prohibición estricta sobre la fuga de Stack Traces y detalles subyacentes de ORMs (como mensajes crudos de restricción única de Prisma), los cuales deberán ser interceptados y traducidos a códigos estables del catálogo.
 
-## 5. Validaciones ejecutadas
-Se ejecutaron exclusivamente comandos asépticos:
-- `npx prisma format`: Ejecutado y exitoso.
-- `npx prisma validate`: Verificó que el AST (Abstract Syntax Tree) del esquema está sano y listo para materializarse en PostgreSQL.
-
-## 6. Riesgos encontrados
-- Ninguno de tipo arquitectónico. A nivel operacional, siempre existe el riesgo pasivo de que un desarrollador intente migrar sobre una cadena de conexión `DATABASE_URL` apuntada erróneamente a producción. La disciplina de la regla DI-001 y el control a través de Docker Compose mitigarán esto orgánicamente.
-
-## 7. Confirmación de Restricciones
-- **NO** se ejecutó `prisma migrate`.
-- **NO** se ejecutó `prisma db push`.
-- **NO** se crearon tablas de PostgreSQL ni se instanció infraestructura mediante Docker.
-- Se certifica que la tarea ha transcurrido estrictamente en el ámbito de la preparación de dependencias, scripts de validación y documentación normativa.
+## 4. Estado y Siguientes Pasos
+La tarea no incluyó escritura de código fuente, cumpliendo con la restricción de diseño de arquitectura. Con los errores definidos, el proyecto está listo para acometer la **TASK-004 (REST Response Standard)**, tras lo cual se procederá a implementar los Exception Handlers y Middlewares correspondientes en Express.
