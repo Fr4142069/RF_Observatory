@@ -375,4 +375,18 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-055. "Validaciones de infraestructura sobre la tecnología objetivo". Las pruebas de integración y persistencia deberán ejecutarse utilizando la misma tecnología que será empleada en producción, salvo que exista una justificación técnica documentada y aprobada. No se utilizará SQLite para simular PostgreSQL.
+**Impacto:** Crítico. Evita caer en el clásico problema de "funcionaba en desarrollo/SQLite pero falló en producción/PostgreSQL". Mantiene la integridad de las pruebas de infraestructura.
+**Estado:** Resuelto y Aprobado.
+
+---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-056. "El hardware de captura está estrictamente desacoplado mediante el RF Gateway". El observatorio no interactuará con el hardware ni conocerá sus interfaces físicas. Un componente intermedio (RF Gateway) asumirá el rol de traducir protocolos de hardware crudo (SDR, ESP32) al formato JSON REST estándar, asumiendo la responsabilidad íntegra de reintentos, buffer y transporte de red.
+**Impacto:** Crítico. Permite iterar el hardware físico y cambiar microcontroladores en el laboratorio sin alterar una sola línea de código del backend de RF_Observatory, consolidando la separación entre la recolección de datos y el motor de inferencia.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
