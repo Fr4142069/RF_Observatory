@@ -1,0 +1,168 @@
+// backend/prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------------------------------------------------------
+// ENUMS (Derivados del dominio puro)
+// ---------------------------------------------------------
+
+enum CaptureStatus {
+  SUCCESS
+  PARTIAL
+  FAILED
+}
+
+enum QualityLevel {
+  EXCELLENT
+  GOOD
+  POOR
+  UNUSABLE
+}
+
+enum EvaluationStatus {
+  EVALUATED
+  PENDING
+  REJECTED
+}
+
+// ---------------------------------------------------------
+// MODELOS RELACIONALES (Traducción 1:1 del Dominio)
+// ---------------------------------------------------------
+
+model Session {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  captures Capture[]
+}
+
+model Capture {
+  id        String   @id @default(uuid())
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  // Relaciones 1:1 (Resultantes de analíticas)
+  fingerprint    Fingerprint?
+  decoderResult  DecoderResult?
+  qualityReport  QualityReport?
+  classification Classification?
+
+  // Relaciones 1:N
+  evidences Evidence[]
+}
+
+model Fingerprint {
+  id        String  @id @default(uuid())
+  captureId String  @unique
+  capture   Capture @relation(fields: [captureId], references: [id], onDelete: Cascade)
+
+  // Value Objects aplanados
+  frequencyValueHertz Float
+  frequencyBandString String?
+  modulationType      String
+
+  // Representación del array nativo
+  pulseDurationsMicroseconds Int[]
+  totalDurationMicroseconds  Int
+  createdAt                  DateTime @default(now())
+}
+
+model KnownProtocol {
+  id           String  @id @default(uuid())
+  name         String  @unique
+  manufacturer String?
+  description  String?
+
+  // Relación necesaria para que Prisma resuelva Foreign Keys
+  classifications Classification[]
+}
+
+model UnknownProtocol {
+  id          String   @id @default(uuid())
+  alias       String   @unique
+  firstSeenAt DateTime @default(now())
+
+  // Relación necesaria para Prisma
+  classifications Classification[]
+}
+
+model Classification {
+  id        String  @id @default(uuid())
+  captureId String  @unique
+  capture   Capture @relation(fields: [captureId], references: [id], onDelete: Cascade)
+
+  // Resolución relacional de un ID agnóstico que puede apuntar a Known o Unknown
+  knownProtocolId String?
+  knownProtocol   KnownProtocol? @relation(fields: [knownProtocolId], references: [id])
+
+  unknownProtocolId String?
+  unknownProtocol   UnknownProtocol? @relation(fields: [unknownProtocolId], references: [id])
+
+  status          String
+  scorePercentage Float
+
+  // Value Object aplanado
+  origin       String
+  observations String?
+  classifiedAt DateTime @default(now())
+
+  // Relación M:N
+  evidences Evidence[]
+}
+
+model Evidence {
+  id        String  @id @default(uuid())
+  captureId String
+  capture   Capture @relation(fields: [captureId], references: [id], onDelete: Cascade)
+
+  evidenceType String
+  description  String
+  referenceUri String // Referencia URI pura, no archivo
+  author       String
+  createdAt    DateTime @default(now())
+
+  // Relación M:N
+  classifications Classification[]
+}
+
+model DecoderResult {
+  id        String  @id @default(uuid())
+  captureId String  @unique
+  capture   Capture @relation(fields: [captureId], references: [id], onDelete: Cascade)
+
+  status CaptureStatus
+
+  // Payload aplanado
+  payloadHex String?
+  payloadBin String?
+
+  origin       String
+  observations String?
+  decodedAt    DateTime @default(now())
+}
+
+model QualityReport {
+  id        String  @id @default(uuid())
+  captureId String  @unique
+  capture   Capture @relation(fields: [captureId], references: [id], onDelete: Cascade)
+
+  overallQuality QualityLevel
+  status         EvaluationStatus
+
+  // SignalMetrics aplanado
+  snrDb             Float?
+  lostPulses        Int?
+  temporalStability Float?
+
+  warnings     String[]
+  observations String?
+  evaluatedAt  DateTime @default(now())
+}

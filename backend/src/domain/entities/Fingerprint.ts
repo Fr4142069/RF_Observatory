@@ -1,0 +1,1 @@
+export interface Fingerprint { id: string; captureId: string; pulseDurationsMicroseconds: number[]; pulseCount: number; frequencyValueHertz: number; modulationType: string; totalDurationMicroseconds: number; }
