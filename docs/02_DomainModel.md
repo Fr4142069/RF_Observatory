@@ -19,7 +19,7 @@ El diseño del dominio está regido por los siguientes principios fundamentales:
 - **Responsabilidad:** Mantener la integridad de los datos puros recibidos y agrupar los resultados de análisis derivados.
 - **Información que representa:** Metadatos temporales, origen de la señal y referencias a sus componentes analíticos.
 - **Ciclo de vida:** Nace tras la recepción, se enriquece durante la clasificación y permanece en almacenamiento a largo plazo (solo lectura).
-- **Relaciones:** Pertenece a una `Session`. Contiene `Fingerprint`, `Evidence`, `Classification`, `QualityReport` y `DecoderResult`.
+- **Relaciones:** Pertenece a una `Session`. Contiene `Fingerprint`, `Evidence`, `ComparisonResult`, `Classification`, `QualityReport` y `DecoderResult`.
 
 ### Session
 - **Propósito:** Agrupar lógicamente un conjunto de capturas relacionadas.
@@ -38,10 +38,16 @@ El diseño del dominio está regido por los siguientes principios fundamentales:
 - **Relaciones:** Pertenece exclusivamente a una `Capture`.
 
 ### KnownProtocol
-- **Propósito:** Representar un estándar o protocolo de comunicación de RF documentado e identificado.
-- **Descripción:** Contiene las reglas, especificaciones teóricas y la lógica de negocio que define a un sistema propietario o abierto (ej. Keeloq, PT2262).
-- **Responsabilidad:** Servir como diccionario y referencia global para validar clasificaciones.
-- **Información que representa:** Nombre, características teóricas de pulsos, reglas de decodificación y fabricante.
+- **Propósito:** Representa el "Catálogo Oficial" del Observatorio. Agrupa y da nombre a una familia de señales de las cuales se tiene certeza técnica, de mercado o teórica. (DA-024). Es conocimiento certificado (DA-025).
+- **Atributos Principales:**
+  - `id` (UUID)
+  - `name` (Ej: 'NICE FLOR-S')
+  - `alias`, `manufacturer`, `version`
+  - `status` ('DRAFT', 'UNDER_REVIEW', 'VALIDATED', 'PUBLISHED', 'DEPRECATED', 'ARCHIVED')
+  - `typicalFrequency`, `modulation`, `encodingType`
+  - `technicalDescription`, `documentationUrl`, `externalReferences`
+- **Responsabilidad:** Servir como diccionario de la verdad para clasificar señales.
+- **Relaciones:** Muchos `Fingerprint` pueden apuntar a un solo `KnownProtocol`.
 - **Ciclo de vida:** Es persistente. Se crea por expertos o por consenso comunitario y se enriquece a lo largo del tiempo.
 - **Relaciones:** Múltiples `Classification` apuntan a esta entidad.
 

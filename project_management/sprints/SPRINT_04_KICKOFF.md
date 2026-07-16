@@ -49,19 +49,21 @@ La Application Layer estará en el medio del flujo: `API -> Application -> Domai
 
 ---
 
-## 5. HOJA DE RUTA (ROADMAP)
-El desarrollo del Sprint 4 seguirá el siguiente orden inmutable:
+## 5. HOJA DE RUTA REVISADA (ROADMAP VERTICAL)
+El desarrollo del Sprint 4 evolucionó hacia un modelo de **verticales funcionales**. Una vez establecidos los cimientos, se construirán los Casos de Uso (UC) de inicio a fin:
 
 | Tarea | Descripción |
 |---|---|
-| **TASK-001** | Estructura de Application Layer (`src/application/...`) |
-| **TASK-002** | DTOs (Data Transfer Objects) |
-| **TASK-003** | Commands & Queries |
-| **TASK-004** | Validation Layer |
-| **TASK-005** | Use Case Base Classes |
-| **TASK-006** | Implementación de Casos de Uso (Core Business) |
-| **TASK-007** | Application Errors (Custom Exceptions) |
-| **TASK-008** | Mappers |
+| **TASK-001** | Estructura de Application Layer |
+| **TASK-002** | DTO Design |
+| **UC-001**   | Register Capture |
+| **UC-002**   | Classify Capture |
+| **UC-003**   | Generate Fingerprint |
+| **UC-004**   | Attach Evidence |
+| **UC-005**   | Compare Fingerprints |
+| **UC-006**   | Register Known Protocol |
+| **UC-007**   | Publish Known Protocol |
+| **UC-008**   | Search Observatory |
 | **TASK-009** | Auditoría Arquitectónica |
 | **TASK-010** | SPRINT_04_CLOSEOUT |
 
