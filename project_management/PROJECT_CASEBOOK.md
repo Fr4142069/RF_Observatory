@@ -447,4 +447,11 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-066. "Gobierno contra la complejidad innecesaria." Ningún componente o módulo nuevo ingresará al núcleo del proyecto si no responde satisfactoriamente a tres preguntas: 1) ¿Qué capacidad nueva aporta? 2) ¿Qué problema concreto resuelve? 3) ¿Podemos demostrar su utilidad con una prueba o demostración operativa? Además, se establece la "Constitución del Proyecto" (`00_CONSTITUTION.md`) como la ley máxima inmutable del ecosistema, por encima de cualquier decisión técnica temporal.
+**Impacto:** Crítico. Protege al proyecto del 'Feature Creep' y garantiza que el Observatorio crezca anclado a necesidades empíricas y operativas, no a suposiciones de ingeniería.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
