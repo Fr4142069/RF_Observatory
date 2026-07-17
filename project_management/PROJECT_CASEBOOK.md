@@ -424,4 +424,11 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-062. "El conocimiento siempre será trazable hasta la evidencia." Ninguna conclusión, similitud o clasificación en el Observatorio existirá sin una cadena ininterrumpida de punteros lógicos hacia la captura física original (`Protocol -> Classification -> Fingerprint -> Evidence`). Esto garantiza la reproducibilidad científica: si los algoritmos de inferencia cambian en el futuro, los Fingerprints podrán regenerarse desde la Evidencia sin alterar los datos crudos originales.
+**Impacto:** Crítico. Convierte al sistema en una Plataforma de Ingeniería Inversa asistida por evidencia, donde todo conocimiento generado es demostrable y re-calculable.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
