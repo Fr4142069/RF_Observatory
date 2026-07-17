@@ -410,4 +410,11 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-060. "El laboratorio nunca interpreta. La verdad científica nace únicamente en el Observatorio". Ningún dispositivo de borde (ESP32, SDR, Gateway) tiene permitido generar conocimiento, inferir, clasificar o reconocer protocolos. Todo el hardware periférico se limita a producir y empaquetar "Evidencia Cruda" bajo el Laboratory Capture Protocol (LCP). Solo el Observatorio puede transformar esa evidencia en conocimiento verificado.
+**Impacto:** Crítico. Asegura la pureza de la evidencia original. Permite reinterpretar datos históricos en el futuro si cambian los algoritmos de clasificación, sin que los datos originales estén contaminados por decisiones tempranas del hardware.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
