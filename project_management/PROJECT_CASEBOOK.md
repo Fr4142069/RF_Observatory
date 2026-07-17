@@ -389,4 +389,11 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-057. "Toda comunicación entre procesos es observable". Toda llamada externa o entre procesos (ej. del Lab Agent hacia el RF_Observatory) deberá registrar, al menos: fecha/hora, destino, endpoint, método HTTP, duración de la llamada, código de respuesta, `requestId` devuelto y resultado.
+**Impacto:** Crítico. Permite reconstruir operaciones completas de extremo a extremo (E2E) cuando algo falla en sistemas distribuidos, brindando observabilidad vital para el mantenimiento del ecosistema.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
