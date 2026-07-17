@@ -438,4 +438,13 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisiones de Arquitectura DA-064 y DA-065 en torno a la "RF Knowledge Platform". 
+- **DA-064:** "Los hechos son permanentes. Las interpretaciones son versionables." La Evidencia (Nivel 1) nunca se modifica. Sin embargo, el Conocimiento inferido (Nivel 2) debe incluir la versión exacta del algoritmo que lo generó (ej. `Algorithm 2.3.1`).
+- **DA-065:** "Toda conclusión debe ser reproducible con la misma evidencia y la misma versión del algoritmo." Si se mejora el motor científico en el futuro, el sistema requerirá un 'Knowledge Reprocessor' capaz de recalcular masivamente todas las evidencias históricas bajo el nuevo algoritmo, sin alterar la evidencia original.
+**Impacto:** Crítico. Transforma el Observatorio en una Plataforma Científica real, separando rígidamente los Datos (Capturas), del Conocimiento (Algoritmos) y de la Experiencia (Dashboard). Permite reprocesamiento histórico masivo.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
