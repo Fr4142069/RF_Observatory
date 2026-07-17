@@ -417,4 +417,11 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-061. "El Modelo Canónico de Datos (CDM) es independiente del Dominio". El lenguaje oficial de intercambio del ecosistema (CDM expuesto vía API) está estrictamente disociado de las Entidades de Dominio internas y de los modelos Prisma. El CDM garantiza estabilidad y compatibilidad hacia atrás frente a clientes de terceros, incluso si el dominio evoluciona. Además, se instaura el término unificador "Evidence" para agrupar capturas RF, imágenes, firmware y análisis de espectro bajo un mismo paraguas epistémico.
+**Impacto:** Estratégico. Prepara al Observatorio para operar como una plataforma pública (SaaS). Protege a los consumidores externos de refactorizaciones internas y amplía masivamente el alcance de los datos recolectados.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
