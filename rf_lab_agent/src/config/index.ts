@@ -13,6 +13,7 @@ export const config = {
   },
   hardware: {
     serialPort: process.env.SERIAL_PORT || 'COM3',
-    baudRate: parseInt(process.env.SERIAL_BAUDRATE || '115200', 10)
+    baudRate: parseInt(process.env.SERIAL_BAUDRATE || '115200', 10),
+    reconnectDelay: parseInt(process.env.SERIAL_RECONNECT_DELAY || '5000', 10)
   }
 };

@@ -1,71 +1,92 @@
 import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline';
-import { IHardwareAdapter } from './IHardwareAdapter';
+import { EventEmitter } from 'events';
 import { AgentLogger } from '../logging/AgentLogger';
 
-export class SerialAdapter implements IHardwareAdapter {
+export interface SerialConfig {
+  path: string;
+  baudRate: number;
+  reconnectDelay: number;
+}
+
+export class SerialAdapter extends EventEmitter {
   private port: SerialPort | null = null;
   private parser: ReadlineParser | null = null;
-  private onDataCallback?: (rawData: any) => void;
+  private isIntentionalClose = false;
 
-  constructor(
-    private readonly path: string,
-    private readonly baudRate: number = 115200
-  ) {}
+  constructor(private readonly config: SerialConfig) {
+    super();
+  }
 
   async connect(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      AgentLogger.info(`Intentando conectar al puerto serial ${this.path} a ${this.baudRate} baudios...`);
-      
-      this.port = new SerialPort({ path: this.path, baudRate: this.baudRate }, (err) => {
-        if (err) {
-          AgentLogger.error(`Error abriendo puerto serial ${this.path}`, err.message);
-          return reject(err);
-        }
-      });
+    this.isIntentionalClose = false;
+    this.attemptConnection();
+  }
 
-      this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
+  private attemptConnection() {
+    if (this.port && this.port.isOpen) return;
 
-      this.parser.on('data', (line: string) => {
-        try {
-          const rawData = JSON.parse(line.trim());
-          if (this.onDataCallback) {
-            this.onDataCallback(rawData);
-          }
-        } catch (e) {
-          AgentLogger.info(`Ignorando traza serial no-JSON: ${line.trim()}`);
-        }
-      });
+    AgentLogger.info(`[Serial] Intentando conectar a ${this.config.path} a ${this.config.baudRate} baudios...`);
 
-      this.port.on('open', () => {
-        AgentLogger.info(`Conexión serial establecida con éxito en ${this.path}`);
-        resolve();
-      });
+    this.port = new SerialPort({ 
+      path: this.config.path, 
+      baudRate: this.config.baudRate,
+      autoOpen: false 
+    });
 
-      this.port.on('error', (err) => {
-        AgentLogger.error(`Error en puerto serial:`, err.message);
-      });
+    this.port.open((err) => {
+      if (err) {
+        AgentLogger.error(`[Serial] Falla al abrir puerto: ${err.message}. Reintentando en ${this.config.reconnectDelay}ms...`);
+        this.scheduleReconnect();
+        return;
+      }
+      AgentLogger.info(`[Serial] Conexión establecida exitosamente en ${this.config.path}`);
+    });
+
+    this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
+
+    this.parser.on('data', (line: string) => {
+      try {
+        const rawData = JSON.parse(line.trim());
+        // DA-059: Publicar evento interno puro, sin lógica de negocio
+        this.emit('CaptureReceivedEvent', rawData);
+      } catch (e) {
+        AgentLogger.info(`[Serial] Ignorando traza no-JSON: ${line.trim()}`);
+      }
+    });
+
+    this.port.on('close', () => {
+      if (!this.isIntentionalClose) {
+        AgentLogger.error(`[Serial] Desconexión inesperada del hardware. Reintentando en ${this.config.reconnectDelay}ms...`);
+        this.scheduleReconnect();
+      }
+    });
+
+    this.port.on('error', (err) => {
+      AgentLogger.error(`[Serial] Error en el puerto: ${err.message}`);
+      // El evento 'close' se disparará automáticamente después del error si el puerto cae.
     });
   }
 
+  private scheduleReconnect() {
+    this.port = null;
+    this.parser = null;
+    setTimeout(() => {
+      this.attemptConnection();
+    }, this.config.reconnectDelay);
+  }
+
   async disconnect(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    this.isIntentionalClose = true;
+    return new Promise((resolve) => {
       if (this.port && this.port.isOpen) {
-        this.port.close((err) => {
-          if (err) {
-            AgentLogger.error('Error cerrando puerto serial', err.message);
-            return reject(err);
-          }
-          AgentLogger.info('Puerto serial cerrado.');
+        this.port.close(() => {
+          AgentLogger.info('[Serial] Puerto cerrado intencionalmente.');
           resolve();
         });
       } else {
         resolve();
       }
     });
-  }
-
-  onDataReceived(callback: (rawData: any) => void): void {
-    this.onDataCallback = callback;
   }
 }

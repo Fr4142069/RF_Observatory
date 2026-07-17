@@ -403,4 +403,11 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-059. "Ningún dato capturado podrá desaparecer silenciosamente". Toda captura que ingrese al RF_Lab_Agent deberá terminar exactamente en uno de estos estados trazables: Enviada, Reintentando, Persistida localmente (Queue) o Error permanente. Nunca puede ser ignorada o desaparecer sin rastro en el pipeline.
+**Impacto:** Crítico. Fomenta el diseño de un sistema basado en confiabilidad extrema donde la preservación de la "evidencia" tiene mayor prioridad que el rendimiento. Obliga a implementar una cola local persistente.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*

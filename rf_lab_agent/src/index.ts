@@ -7,7 +7,7 @@ import { AgentLogger } from './logging/AgentLogger';
 async function bootstrap() {
   AgentLogger.info(`=== Inicializando RF Lab Agent [${config.agent.id}] ===`);
 
-  const hardware = new SerialAdapter(config.hardware.serialPort, config.hardware.baudRate);
+  const hardware = new SerialAdapter(config.hardware);
   const client = new ObservatoryClient();
   
   const engine = new AgentEngine(hardware, client);
