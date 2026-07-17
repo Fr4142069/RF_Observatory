@@ -384,8 +384,8 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 ---
 
 ### [2026-07-16] - Sprint 6
-**Descripción:** Decisión de Arquitectura DA-056. "El hardware de captura está estrictamente desacoplado mediante el RF Gateway". El observatorio no interactuará con el hardware ni conocerá sus interfaces físicas. Un componente intermedio (RF Gateway) asumirá el rol de traducir protocolos de hardware crudo (SDR, ESP32) al formato JSON REST estándar, asumiendo la responsabilidad íntegra de reintentos, buffer y transporte de red.
-**Impacto:** Crítico. Permite iterar el hardware físico y cambiar microcontroladores en el laboratorio sin alterar una sola línea de código del backend de RF_Observatory, consolidando la separación entre la recolección de datos y el motor de inferencia.
+**Descripción:** Decisión de Arquitectura DA-056. "Los proyectos colaboran mediante contratos públicos". Ningún proyecto puede importar código fuente de otro proyecto para reutilizar lógica de negocio. La colaboración entre RF_Gateway y RF_Observatory se realizará exclusivamente mediante contratos públicos (HTTP, OpenAPI o protocolos definidos), preservando la independencia de ambos ciclos de vida.
+**Impacto:** Crítico. Permite que RF_Observatory evolucione sin obligar a recompilar el Gateway, habilita la sustitución del Gateway por otras implementaciones (ej. Go o Rust) y posibilita múltiples gateways consumiendo la misma API, evitando el acoplamiento entre proyectos.
 **Estado:** Resuelto y Aprobado.
 
 ---

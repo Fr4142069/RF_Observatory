@@ -1,22 +1,29 @@
 # TASK-S6-004: RF Gateway Bootstrap
 
 ## Información General
-- **Proyecto:** RF_Observatory
+- **Proyecto:** RF_Gateway (Independiente)
 - **Sprint:** Sprint 6
-- **Tipo:** Implementación de Infraestructura (Gateway)
+- **Tipo:** Bootstrap
 - **Estado:** Completada
 
 ## Objetivo
-Implementar el esqueleto base del RF Gateway respetando la arquitectura diseñada en la TASK-003, dotándolo de capacidades de encolamiento, reintentos y abstracción de hardware.
+Inicializar la estructura del proyecto independiente **RF Gateway**, materializando el chasis arquitectónico dictado por la TASK-004 sin implementar aún lógica de comunicación física ni HTTP real, y estableciendo la formal separación de responsabilidades a nivel de repositorios lógicos.
 
-## Avance de la Implementación
-1. **Creación del Proyecto:** Se generó un proyecto Node.js/TypeScript independiente en la carpeta `/gateway`, separando físicamente el observatorio del recolector.
-2. **Interfaces Core (`src/adapters/IHardwareAdapter.ts`):** Se estableció el contrato que obligará a cualquier dispositivo futuro a estandarizar su entrada de datos.
-3. **Manejo de Red (ApiClient & MessageBuffer):**
-   - Se configuró `ApiClient` con Axios y manejo de timeouts para envíos al endpoint `POST /api/v1/captures`.
-   - Se implementó `MessageBuffer`, una cola en memoria local que retiene capturas fallidas por interrupciones de red (Error 5xx o timeout) y realiza reintentos asíncronos.
-4. **Gateway Engine (`src/core/GatewayEngine.ts`):** Orquestador central que escucha al hardware, encola el payload y dispara el procesamiento HTTP.
-5. **Simulación (DummyAdapter):** Se incluyó un `DummyAdapter` temporal que emite pulsos simulados de RF cada 10 segundos para poder probar el Gateway sin conectar hardware físico de inmediato.
+## Entregables Generados
+- Carpeta raíz `rf_gateway/` inicializada como paquete independiente (`npm init`).
+- Estructura de directorios core: `src/config`, `src/capture`, `src/transport`, `src/api`, `src/queue`, `src/logging`, `src/health`, `src/bootstrap`, además de `docs/` y `tests/`.
+- Documento normativo oficial: `docs/36_RFGatewayBootstrap.md`.
+- Formalización de la Decisión de Arquitectura **DA-056** en el Casebook: *"Los proyectos colaboran mediante contratos públicos"*, prohibiendo la compartición de código fuente directo entre el Observatorio y el Gateway.
 
-## Conclusión
-El primer componente de "Laboratorio" del ecosistema está vivo. Conecta y emite señales (simuladas por ahora) y maneja automáticamente la caída del servidor re-encolando la información. Esto cierra el primer gran bloque del Sprint 6.
+## Tareas Completadas
+- [x] Creación del esqueleto de directorios.
+- [x] Instalación de dependencias base (`typescript`, `ts-node`, `axios`, `dotenv`).
+- [x] Documentación arquitectónica de responsabilidades por carpeta.
+- [x] Eliminación de la estructura acoplada temporal previa (`gateway/`).
+
+## Próximos Pasos (Hoja de Ruta)
+El chasis está listo para comenzar a ser ensamblado. Según la planificación estratégica, las próximas tareas se enfocarán en construir las piezas internas de este Gateway:
+1. **TASK-005:** HTTP Client Infrastructure (Para consumir el API).
+2. **TASK-006:** Event Queue (Para retención y reintentos).
+3. **TASK-007:** ESP32 Serial Adapter (Para leer el hardware).
+4. **TASK-008:** First Real Capture Pipeline (El hito del end-to-end físico).
