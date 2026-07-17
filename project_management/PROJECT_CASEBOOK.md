@@ -396,4 +396,11 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Metodología DA-058. "Transición a Ingeniería Experimental". A partir del Sprint 6, el proyecto adopta un enfoque empírico regido por la jerarquía: Sprint -> Epic -> Experiment -> Task. El avance de integraciones físicas (ej. Lab Agent) se medirá mediante experimentos con Hipótesis, Configuración, Resultados y Conclusiones basadas en evidencia empírica (latencia, stress, resiliencia), abandonando la asunción pura de software.
+**Impacto:** Sistémico. Transforma a RF_Observatory de un proyecto de software a una plataforma de ingeniería científica y observable. Cambia el paradigma de documentación hacia reportes de experimentación reales (`EXP_xxx_REPORT.md`).
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
