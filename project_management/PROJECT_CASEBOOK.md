@@ -431,4 +431,11 @@ Además, se adopta formalmente la nomenclatura funcional para el rastreo del pro
 **Estado:** Resuelto y Aprobado.
 
 ---
+
+### [2026-07-16] - Sprint 6
+**Descripción:** Decisión de Arquitectura DA-063. "El conocimiento se obtiene por acumulación de evidencia, no por una observación aislada." El sistema abandona el modelo declarativo ("Esto ES el protocolo X") y adopta un modelo probabilístico e iterativo. Toda clasificación inicial nace como una "Hipótesis" que indica un porcentaje de confianza. Dicha confianza sube o baja conforme ingresa nueva evidencia empírica. Se introduce el concepto de "Madurez del Conocimiento" (Experimental, Validated, Reference).
+**Impacto:** Crítico. Transforma al Observatorio de una simple base de datos de capturas a un verdadero "Motor Científico" con capacidades de Data Science, trazando la procedencia exacta de cada conclusión generada.
+**Estado:** Resuelto y Aprobado.
+
+---
 *(Nuevas anotaciones deberán reflejarse en este documento en orden cronológico descendente, registrando de manera rigurosa Fecha, Sprint, Descripción, Impacto y Estado).*
